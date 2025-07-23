@@ -15,7 +15,8 @@ export function Download(props){
                 },
         }).then((response) => {
             
-            const create_url = window.URL.createObjectURL(new Blob([JSON.stringify(response.data, null, "\t")]));
+            const sanitizedData = JSON.stringify(response.data, null, "\t").replace(/</g, "\\u003c").replace(/>/g, "\\u003e");
+            const create_url = window.URL.createObjectURL(new Blob([sanitizedData]));
             const generate_link = document.createElement('a');
 
             generate_link.href = create_url;

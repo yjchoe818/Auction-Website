@@ -6,6 +6,13 @@ const { Op } = require("sequelize");
 const fs = require('fs');
 const js2xml = require('js2xml').Js2Xml;
 const xml2js = require('xml2js');
+const rateLimit = require('express-rate-limit');
+
+// Apply rate limiting to the importxmls route
+const importXmlsLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10 // limit each IP to 10 requests per windowMs
+});
 
 router.get('/', async (req, res) => {
 
@@ -1042,7 +1049,7 @@ router.get('/top/:id', async (req, res) => {
 
 // this to import the xmls in the database
 // comment out so it doesn't run when the site is "online"
-router.post('/importxmls', async (req, res) => {
+router.post('/importxmls', importXmlsLimiter, async (req, res) => {
 
     const parser = new xml2js.Parser();
     var path = require("path");

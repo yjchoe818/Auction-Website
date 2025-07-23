@@ -12,7 +12,7 @@ const validateTheToken = (req, res, next) =>{
     else{
 
         try {
-            const validTokenito = verify(accessToken, "hereputyoursecret");
+            const validTokenito = verify(accessToken, process.env.JWT_SECRET);
             if(validTokenito){
                 req.user = validTokenito;
                 return next();

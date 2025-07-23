@@ -156,7 +156,7 @@ function FilterCategories() {
       return <div className='item' onClick={()=>{navigate(`/item/${value.id}`)}}> 
               <div className='name'>{value.name} </div>
               <div className='body'>
-                  <img className='lando_image' alt="cover" src={value.coverPhoto} />
+                  <img className='lando_image' alt="cover" src={encodeURI(value.coverPhoto)} />
               </div>
               <div className='footer gradient-custom'>
                   <div > {value.location}, {value.country}</div> 

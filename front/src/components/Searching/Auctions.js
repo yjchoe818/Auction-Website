@@ -66,10 +66,11 @@ function Auctions() {
 
     // Displaying the items of this particular page
     const displayItems = itemList.slice( visitedPages, visitedPages + itemsPerPage ).map((value, key)=>{
+      const sanitizedCoverPhoto = value.coverPhoto.startsWith('http') ? value.coverPhoto : ''; // Sanitize the URL
       return <div className='item' key={key} onClick={()=>{navigate(`/item/${value.id}`)}}> 
               <div className='name'>{value.name} </div>
               <div className='body'>
-                  <img className='lando_image' src={value.coverPhoto} alt="coverphoto" />
+                  <img className='lando_image' src={sanitizedCoverPhoto} alt="coverphoto" />
               </div>
               <div className='footer gradient-custom'>
                   <div > {value.location}, {value.country}</div> 

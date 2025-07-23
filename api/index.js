@@ -10,6 +10,8 @@ const bcrypt = require('bcrypt');
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
+const helmet = require('helmet');
+const csurf = require('csurf');
 
 // then express and cors
 app.use(express.json());
@@ -18,6 +20,10 @@ app.use(cors({
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
 }));
+
+// Security enhancements
+app.use(helmet()); // Use Helmet to secure HTTP headers
+app.use(csurf()); // Enable CSRF protection
 
 // this for the cookies
 app.use(cookieParser());
@@ -31,6 +37,7 @@ app.use(session({
     cookie: {
         // cookie expires in 8 hours
         expires: 60 * 60 * 8,
+        secure: true, // Ensure cookies are sent over HTTPS
     },
 }));
 

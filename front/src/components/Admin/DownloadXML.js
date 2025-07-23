@@ -23,6 +23,7 @@ export function DownloadXML(props){
             generate_link.setAttribute('download', 'auctions.xml');
             document.body.appendChild(generate_link);
             generate_link.click();
+            document.body.removeChild(generate_link); // Ensure the link is removed after use
         });
     }
 
