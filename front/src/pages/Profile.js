@@ -123,7 +123,7 @@ function Profile() {
             return <div className='item' onClick={()=>{navigate(`/item/${value.id}`)}}> 
                     <div className='name'>{value.name} </div>
                     <div className='body'>
-                        <img className='lando_image' src={value.coverPhoto} alt="product" />
+                        <img className='lando_image' src={encodeURI(value.coverPhoto)} alt="product" />
                     </div>
                     <div className='footer gradient-custom'>
                         <div > {value.location}, {value.country}</div> 

@@ -5,6 +5,13 @@ const { upload } = require('../middlewares/Upload');
 const { Photo, Item } = require('../models');
 const fs = require('fs');
 const path = require("path");
+const rateLimit = require('express-rate-limit');
+
+// Rate limiting middleware
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100 // limit each IP to 100 requests per windowMs
+});
 
 // No token cause this needs to work for guests as well
 router.get('/:id', async (req, res) => {
@@ -82,11 +89,11 @@ router.post('/:id', validateTheToken, upload.single('image'), async (req, res) =
 
 
 // validate the user too before deleting
-router.delete('/:id', validateTheToken, async (req, res)=>{
+router.delete('/:id', validateTheToken, limiter, async (req, res)=>{
     const myId = req.params.id;
     const photograph = await Photo.findOne({ where: {id: myId}});
     const itemId = photograph.ItemId;
-    const localpath = path.join(__dirname, '..', 'images', photograph.url.split('/').pop())
+    const localpath = path.join(__dirname, '..', 'images', path.basename(photograph.url.split('/').pop()));
 
     await Photo.destroy({where : {
         id: myId,

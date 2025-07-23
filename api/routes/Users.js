@@ -5,6 +5,14 @@ const bcrypt = require('bcrypt');
 const {sign} =require('jsonwebtoken');
 const { validateTheToken } = require('../middlewares/Authent');
 const { Op } = require("sequelize");
+const rateLimit = require('express-rate-limit');
+
+// Rate limiting middleware for login route
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // limit each IP to 5 requests per windowMs
+    message: "Too many login attempts from this IP, please try again after 15 minutes"
+});
 
 router.post('/', async (req, res) => {
     
@@ -35,7 +43,7 @@ router.post('/', async (req, res) => {
 
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
     
     const { username , password } = req.body;
 
@@ -57,7 +65,7 @@ router.post('/login', async (req, res) => {
                     res.json({error: "Wrong User Credentials!"});
                 }
                 else{
-                    const accessToken = sign({username: user.username, id: user.id}, "hereputyoursecret");
+                    const accessToken = sign({username: user.username, id: user.id}, process.env.JWT_SECRET);
                     res.json({token: accessToken, username: user.username, id: user.id });
                 }
             });
@@ -159,18 +167,22 @@ router.put('/approve', validateTheToken, async (req, res) => {
     const username = req.user.username;
 
     if (username==='admin'){
-        for (var i = 0; i < userList.length; i++) {
-            var userId = userList[i];
-            console.log(userId);
-            await User.update({
-                approved: true
-                },
-                {where : { 
-                    id: userId
-                }
-            });
+        if (Array.isArray(userList) && userList.length <= 100) { // Validate userList
+            for (var i = 0; i < userList.length; i++) {
+                var userId = userList[i];
+                console.log(userId);
+                await User.update({
+                    approved: true
+                    },
+                    {where : { 
+                        id: userId
+                    }
+                });
+            }
+            res.json("Succesfully approved users!");
+        } else {
+            res.json("Invalid user list!");
         }
-        res.json("Succesfully approved users!");
     }
     else{
         res.json("This is forbidden!")
